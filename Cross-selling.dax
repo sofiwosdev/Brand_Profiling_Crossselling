@@ -1,0 +1,27 @@
+﻿//Cross selling matrix for a certain brand group of buyers. What do "bebes" buyers purchase?
+
+
+DEFINE
+    VAR Buyers_group =
+        CALCULATEtable (
+            VALUES ( dim_customers[customer_id] ),
+            dim_products[product_category_name] = "bebes"
+        )
+
+EVALUATE
+
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        fact_items[Prod_category],
+        "tx", distinctcount(fact_items[order_id]),
+        "gmv", ROUND(sumx(fact_items,fact_items[price]*fact_items[Units]),0)
+    ),
+    Buyers_group,
+    dim_geo[geolocation_city] = "sao paulo",
+    'Calendar'[Date]
+        >= DATE ( 2001, 11, 01 )
+        && DATE ( 2021, 11, 30 )
+)
+
+
+
